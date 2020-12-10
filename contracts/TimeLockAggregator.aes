@@ -2,7 +2,7 @@
 
 contract TimeLockAggregator =
    record state  = 
-      { lockGroup : map(address, lockSequence, chain.timestamp, chain.difficulty) }
+      { lockGroup : map(address, lockSequence), lockTime  : int, lockRoute : int}
 
    record lockSequence =
       { lockStart : string
