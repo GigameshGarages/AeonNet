@@ -18,7 +18,7 @@ contract TimeLockAggregator =
            age = age }
       put(state{ people[person_address] = new_person })
 
-   entrypoint timeLockVerifier(person_address : address) : person = 
+   entrypoint timeLockVerifier(person_address : address) : lockSequence = 
       switch(Map.lookup(person_address, state.people))
          None => abort("No data for that person")
          Some(person_found) => person_found
