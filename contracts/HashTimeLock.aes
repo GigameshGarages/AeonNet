@@ -1,3 +1,5 @@
+@compiler >= 4
+
 include "List.aes"
 payable contract HashTimeLock = 
 
