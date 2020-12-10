@@ -5,20 +5,20 @@ contract ProofOfTimeLock =
 
    stateful entrypoint init() = { timeLocks = {}, next_id = 0 }
 
-   entrypoint lockExists(name: string) : bool =
-      Map.member(name, state.timeLocks)
+   entrypoint lockExists(lockOwner: string) : bool =
+      Map.member(lockOwner, state.timeLocks)
 
    stateful entrypoint verifyTimeLocks(timeLocks: string) =
-      require(!lockExists(lockDifficulty), "TimeLock is already taken")
-      signTimeLocks(lockDifficulty, signMultipleTimeLocks(lockDifficulty))
+      require(!lockUnique(lockOwner, lockDifficulty, lockSequence), "TimeLock is already taken")
+      signTimeLocks(lockOwner, signMultipleTimeLocks(lockSequence))
    
    entrypoint signTimeLocks(lockOwner: string) : hash =
-      require(nameExists(lockDifficulty), "TimeLocks does not exist!")
-      state.timeLocks[lockDifficulty]
+      require(lockExists(lockOwner, lockDifficulty, lockSequence), "TimeLocks does not exist!")
+      state.timeLocks[lockOwner, lockDifficulty, lockSequence]
 
-   stateful function signMultipleTimeLocks(lockOwner: string, lockSign: hash) =
-      put(state{timeLocks[Chain.timestamp] = difficulty, next_id = (state.next_id + 1)})
-      Chain.event(signTimeLocks(state.next_id, lockOwner, lockSign))
+   stateful function signMultipleTimeLocks(lockOwner: string, lockDifficulty: string, lockSequence: hash) =
+      put(state{timeLocks[Chain.timestamp] = lockSequence, next_id = (state.next_id + 1)})
+      Chain.event(signTimeLocks(state.next_id, lockOwner, lockDifficulty, lockSequence, lockRound))
  
    function verifyTimeLocks(lockOwner : string) : hash =
       String.sha3(lockOwner)
