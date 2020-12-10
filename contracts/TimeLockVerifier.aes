@@ -1,0 +1,25 @@
+contract ProofOfTimeLock =
+   datatype event = NewTimeLocks(indexed int, string, hash)
+
+   record state = { timeLocks : map(string, hash), next_id : int }
+
+   stateful entrypoint init() = { timeLocks = {}, next_id = 0 }
+
+   entrypoint lockExists(name: string) : bool =
+      Map.member(name, state.timeLocks)
+
+   stateful entrypoint verifyTimeLocks(timeLocks: string) =
+      require(!lockExists(lockDifficulty), "TimeLock is already taken")
+      signTimeLocks(lockDifficulty, signMultipleTimeLocks(lockDifficulty))
+   
+   entrypoint signTimeLocks(lockOwner: string) : hash =
+      require(nameExists(lockDifficulty), "TimeLocks does not exist!")
+      state.timeLocks[lockDifficulty]
+
+   stateful function signMultipleTimeLocks(lockOwner: string, lockSign: hash) =
+      put(state{timeLocks[Chain.timestamp] = difficulty, next_id = (state.next_id + 1)})
+      Chain.event(signTimeLocks(state.next_id, lockOwner, lockSign))
+ 
+   function verifyTimeLocks(lockOwner : string) : hash =
+      String.sha3(lockOwner)
+      
