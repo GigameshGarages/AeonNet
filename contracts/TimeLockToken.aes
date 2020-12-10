@@ -16,9 +16,9 @@ contract TimeLockToken =
    
    //struct of properties 
   record properties ={
-    productName : string,
-    lockTime : int,
+    eventName : string,
     useTime : int,
+    lockTime : int,
     isCounterfeit : bool,
     stage_1 : bool,
     stage_2 :  bool,
@@ -71,13 +71,13 @@ contract TimeLockToken =
   // tokenURI The tokenURI of the the tokenURI
   // asset properties of token assigned with tokenId
   
-  stateful entrypoint mint(to : address, tokenUri : string,  productName : string, deliverydate: int) =
+  stateful entrypoint mint(to : address, tokenUri : string,  eventName : string, useTime: int) =
     _mint(state._nextTokenId, to)
     set_token_uri(state._nextTokenId, tokenUri)
     let newassetProp: properties ={
-      productName= productName,
-      deliverydate=deliverydate,
-      datecreated= Chain.timestamp,
+      eventName= eventName,
+      useTime=useTime,
+      lockTime= Chain.timestamp,
       isCounterfeit =false,
       stage_1 = true,
       stage_2 = false,
@@ -87,14 +87,14 @@ contract TimeLockToken =
     put(state{_nextTokenId = (state._nextTokenId +1)})
     
    // stateful function for updating the asset name property of given TokenId 
-  stateful entrypoint updateProductName(tokenId :  int, productName : string)=
+  stateful entrypoint updateProductName(tokenId :  int, eventName : string)=
     only_token_owner(Call.caller, tokenId)
     require(state.assetProperties[tokenId].isCounterfeit == false, "asset is counterfeit")
-    put(state{assetProperties[tokenId].productName = productName})
+    put(state{assetProperties[tokenId].eventName = eventName})
     
    // return the product name that is azssigned to token ID 
   entrypoint getProductName(tokenId : int) : string =
-    state.assetProperties[tokenId].productName
+    state.assetProperties[tokenId].eventName
 
   // create product with tokenid and for the address "to"
   private stateful function _mint(token_id: int, to: address) = 
