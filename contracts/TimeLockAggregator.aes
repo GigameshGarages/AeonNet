@@ -18,7 +18,7 @@ contract TimeLockAggregator =
            lockNonce = lock_Nonce }
       put(state{ lockGroup[lock_Owner] = new_Sequence })
 
-   entrypoint timeLockVerifier(lock_Owner : address) : lockSequence = 
+   entrypoint timeLockLoopUp(lock_Owner : address) : lockSequence = 
       switch(Map.lookup(lock_Owner, state.lockGroup))
          None => abort("No data for that TimeLock")
          Some(lock_exist) => lock_exist
