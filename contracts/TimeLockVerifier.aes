@@ -2,9 +2,9 @@
 
 contract TimeLockAggregator =
    record state  = 
-      { people : map(address, person) }
+      { people : map(address, lockSequence) }
 
-   record person =
+   record lockSequence =
       { first_name : string
       , last_name  : string
       , age        : int }
@@ -12,7 +12,7 @@ contract TimeLockAggregator =
    entrypoint init() = { people = {} }
 
    stateful entrypoint timeLockAggregator(person_address: address, first_name': string, last_name': string, age: int) =
-      let new_person : person =
+      let new_person : lockSequence =
          { first_name = first_name',
            last_name = last_name',
            age = age }
