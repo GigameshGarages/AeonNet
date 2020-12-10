@@ -5,8 +5,8 @@ contract TimeLockAggregator =
       { lockGroup : map(address, lockSequence) }
 
    record lockSequence =
-      { lockStart : string
-      , lockRoute : string
+      { lockStart : int
+      , lockRoute : int
       , lockNonce : int }
 
    entrypoint init() = { lockGroup = {} }
