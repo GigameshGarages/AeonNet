@@ -11,14 +11,14 @@ contract TimeLockAggregator =
 
    entrypoint init() = { people = {} }
 
-   stateful entrypoint TimeLockAggregator(person_address: address, first_name': string, last_name': string, age: int) =
+   stateful entrypoint timeLockAggregator(person_address: address, first_name': string, last_name': string, age: int) =
       let new_person : person =
          { first_name = first_name',
            last_name = last_name',
            age = age }
       put(state{ people[person_address] = new_person })
 
-   entrypoint TimeLockVerifier(person_address : address) : person = 
+   entrypoint timeLockVerifier(person_address : address) : person = 
       switch(Map.lookup(person_address, state.people))
          None => abort("No data for that person")
          Some(person_found) => person_found
