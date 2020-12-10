@@ -8,17 +8,13 @@ contract TimeLockAggregator =
       { lockStart : string
       , lockRoute : string
       , lockNonce : int }
-      
-    record lockQuality =
-      { lockDifficulty : int
-       , lockTrigger   : int }
 
    entrypoint init() = { lockGroup = {} }
 
    stateful entrypoint timeLockAggregator(lock_Owner: address, lock_Start': string, lock_Route': string, lock_Nonce: int) =
       let new_Sequence: lockSequence =
-         { lockStart = lock_Start',
-           lockRoute = lock_Route',
+         { lockStart = chain.TimeStamp,
+           lockRoute = chain.Difficulty',
            lockNonce = lock_Nonce }
       put(state{ lockGroup[lock_Owner] = new_Sequence })
 
