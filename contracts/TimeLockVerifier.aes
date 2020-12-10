@@ -16,7 +16,7 @@ contract TimeLockAggregator =
          { lockStart = lock_Start',
            lockRoute = lock_Route',
            lockNonce = lock_Nonce }
-      put(state{ people[lock_Owner] = new_Sequence })
+      put(state{ lockGroup[lock_Owner] = new_Sequence })
 
    entrypoint timeLockVerifier(lock_Owner : address) : lockSequence = 
       switch(Map.lookup(lock_Owner, state.lockGroup))
