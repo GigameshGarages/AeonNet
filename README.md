@@ -1,5 +1,5 @@
-# NimbleNet
-Coherent Convergent Clearing House On Aeternity Blockchain
+# AeonNet
+Convergent and Coherent Clearing House powered by Aeternity Time Locked Token Contracts
 
 # Concept
 - Hash Time Locked Smart Contract for Controlling the Clearing House Workflow
