@@ -8,6 +8,10 @@ contract TimeLockAggregator =
       { lockStart : string
       , lockRoute : string
       , lockNonce : int }
+      
+    record lockQuality =
+      { lockDifficulty : int
+       , lockTrigger   : int }
 
    entrypoint init() = { lockGroup = {} }
 
@@ -17,8 +21,7 @@ contract TimeLockAggregator =
            lockRoute = lock_Route',
            lockNonce = lock_Nonce }
       put(state{ lockGroup[lock_Owner] = new_Sequence })
-          lockTrigger = chain.TimeStamp
-          lockDifficulty = chain.Difficulty
+
 
    entrypoint timeLockLoopUp(lock_Owner : address) : lockSequence = 
       switch(Map.lookup(lock_Owner, state.lockGroup))
