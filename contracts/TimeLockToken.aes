@@ -17,8 +17,8 @@ contract TimeLockToken =
    //struct of properties 
   record properties ={
     productName : string,
-    deliverydate : int,
-    datecreated : int,
+    lockTime : int,
+    useTime : int,
     isCounterfeit : bool,
     stage_1 : bool,
     stage_2 :  bool,
