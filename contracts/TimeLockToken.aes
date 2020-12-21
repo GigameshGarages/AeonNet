@@ -71,7 +71,7 @@ contract TimeLockToken =
   // tokenURI The tokenURI of the the tokenURI
   // asset properties of token assigned with tokenId
   
-  stateful entrypoint mint(to : address, tokenUri : string,  eventName : string, useTime: int) =
+  stateful entrypoint mint(to : address, tokenUri : string,  InitialPrice : int, useTime: int) =
     _mint(state._nextTokenId, to)
     set_token_uri(state._nextTokenId, tokenUri)
     let newassetProp: properties ={
@@ -87,14 +87,14 @@ contract TimeLockToken =
     put(state{_nextTokenId = (state._nextTokenId +1)})
     
    // stateful function for updating the asset name property of given TokenId 
-  stateful entrypoint updateEventName(tokenId :  int, eventName : string)=
+  stateful entrypoint updatePriceValue(tokenId :  int, LivePrice : int)=
     only_token_owner(Call.caller, tokenId)
     require(state.assetProperties[tokenId].isContinous == false, "asset is not time valued")
-    put(state{assetProperties[tokenId].eventName = eventName})
+    put(state{assetProperties[tokenId].InitialPrice = LivePrice})
     
    // return the event name that is azssigned to token ID 
-  entrypoint getEventName(tokenId : int) : string =
-    state.assetProperties[tokenId].eventName
+  entrypoint getPriceValue(tokenId : int) : string =
+    state.assetProperties[tokenId].InitialPrice
 
   // create event with tokenid and for the address "to"
   private stateful function _mint(token_id: int, to: address) = 
