@@ -92,11 +92,11 @@ contract TimeLockToken =
     require(state.assetProperties[tokenId].isContinous == false, "asset is not time valued")
     put(state{assetProperties[tokenId].InitialPrice = LivePrice})
     
-   // return the event name that is azssigned to token ID 
+   // return the option price value that is azssigned to token ID 
   entrypoint getPriceValue(tokenId : int) : string =
     state.assetProperties[tokenId].InitialPrice
 
-  // create event with tokenid and for the address "to"
+  // create option price with tokenid and for the address "to"
   private stateful function _mint(token_id: int, to: address) = 
     only_owner(Call.caller)
     require(!check_token_exists(token_id), "Token can't be overrided")
