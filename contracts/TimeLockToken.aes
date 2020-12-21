@@ -1,5 +1,7 @@
+// state is handled for the storing the elements on blockchain
+// deployment of token with  NFT Token name or NFT Token symbol
+
 contract TimeLockToken =
-  // state is handled for the storing the elements on blockchain
 
   record state = { 
     name: string,
@@ -19,13 +21,11 @@ contract TimeLockToken =
     eventName : string,
     useTime : int,
     lockTime : int,
-    isCounterfeit : bool,
+    isContinous : bool,
     stage_1 : bool,
     stage_2 :  bool,
     stage_3 : bool}
   
-  // deployment of token with  NFT Token name or NFT Token symbol
-
   stateful entrypoint init(name: string, symbol: string, owner: address) = {
   	name = name,
   	symbol = symbol,
@@ -78,7 +78,7 @@ contract TimeLockToken =
       eventName= eventName,
       useTime=useTime,
       lockTime= Chain.timestamp,
-      isCounterfeit =false,
+      isContinous =false,
       stage_1 = true,
       stage_2 = false,
       stage_3= false}
