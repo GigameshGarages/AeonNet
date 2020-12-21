@@ -15,9 +15,10 @@ This prototype is a step towards using Aeternity Protocol for tokenising Bitcoin
 
 It has been a solo effort so far. I am looking forward to collaborating with hello Aeternitians here to refine the prototype and deploy this into the Aeternity MainNet as a time locked bridge to bring the might of Bitcoin into the magical powers and possibilities of Aeternity !! After all, in our voyage to Aeternity, we need a lot of time locks and time machines.
 
-## Technology
+## Components
 - Hash Time Locks implemented through the Time Stamping Transactions in a Blockchain
 - Time Value Token created as a Non Fungible Token in the Aeternity Token Standard
+- Time Value Aggregator using Time Lock Properties such as Sequence, Route and Order
 
 ## Tools
 - Aeternity Node
