@@ -18,7 +18,7 @@ contract TimeLockToken =
    
    //struct of properties 
   record properties ={
-    eventName : string,
+    InitialPrice : int,
     useTime : int,
     lockTime : int,
     isContinous : bool,
@@ -75,7 +75,7 @@ contract TimeLockToken =
     _mint(state._nextTokenId, to)
     set_token_uri(state._nextTokenId, tokenUri)
     let newassetProp: properties ={
-      eventName= eventName,
+      InitialPrice= InitialPrice,
       useTime=useTime,
       lockTime= Chain.timestamp,
       isContinous =false,
@@ -89,7 +89,7 @@ contract TimeLockToken =
    // stateful function for updating the asset name property of given TokenId 
   stateful entrypoint updateEventName(tokenId :  int, eventName : string)=
     only_token_owner(Call.caller, tokenId)
-    require(state.assetProperties[tokenId].isCounterfeit == false, "asset is counterfeit")
+    require(state.assetProperties[tokenId].isContinous == false, "asset is not time valued")
     put(state{assetProperties[tokenId].eventName = eventName})
     
    // return the event name that is azssigned to token ID 
