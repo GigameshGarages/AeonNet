@@ -1,4 +1,4 @@
-// reference - https://github.com/arthas168/Hash-Time-Lock
+// Adaptation of - https://github.com/arthas168/Hash-Time-Lock
 
 @compiler >= 4
 
