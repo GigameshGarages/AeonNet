@@ -1,0 +1,29 @@
+@compiler >= 4
+
+contract AeonCrypt =
+  type state = map(int, order)
+  record order =
+    { data      : string
+    , requests  : map(address, decryption_key) }
+
+  type decryption_key = option(string)
+   
+  stateful entrypoint init() : state = {}
+  
+  stateful entrypoint place(data': string) : unit =
+    put(state{[Map.size(state)] = { data = data', requests = {} } })
+
+  stateful entrypoint claim(id: int) : unit =
+    exists(id)
+    put(state{ [id].requests[Call.caller] = None })
+    
+  stateful entrypoint unlock(id: int, decryption_keys: map(address, option(string))) : unit =
+    exists(id)
+    put(state{ [id].requests = decryption_keys })
+    
+  entrypoint take(id: int) : order =
+    exists(id)
+    state[id]
+  
+  function exists(id: int) : unit =
+    require(Map.member(id, state), "INVALID_ID")
