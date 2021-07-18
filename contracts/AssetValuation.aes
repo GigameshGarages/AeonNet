@@ -1,4 +1,4 @@
-contract CryptoHamster =
+contract AssetValuation =
    datatype event = NewHamster(indexed int, string, hash)
 
    record state = { hamsters : map(string, hash), next_id : int }
