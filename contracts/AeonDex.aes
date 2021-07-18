@@ -1,0 +1,417 @@
+contract Token =
+  public function transfer : (address, int) => bool
+  public function transferFrom : (address, address, int) => bool
+
+contract AeonDex =
+  record state =
+    {
+      makerFee : int,
+      takerFee : int,
+      referralFee: int,
+      tokenOrders : map(address, map(string, order)),
+      tradeHistory : list(order),
+      users : map(address, user),
+      referrals: map(address, address),
+      feeAccount: address
+    }
+
+  public stateful function init(_feeAccount : address, _makerFee : int, _takerFee : int) =
+    {
+        makerFee = _makerFee,
+        takerFee = _takerFee,
+        referralFee = 200000000000000000, // 20%
+        tokenOrders = {},
+        tradeHistory = [],
+        users={},
+        referrals = {},
+        feeAccount = _feeAccount
+      }
+
+  record balance =
+    {
+      fullBalance : int,
+      availableBalance : int
+    }
+
+  record user =
+    {
+      balances : map(address, balance),
+      orderHistory : map(string, order),
+      orders : map(string, order)
+    }
+
+  // order of the properties is important for memory optimizations
+  record order =
+    {
+      sellAmount : int,
+      buyAmount : int,
+      filled : int,
+      status : int, // 0: open, 1: partially filled, 2: filled, 3: cancelled, 4: error
+      sellToken : address,
+      buyToken : address,
+      maker : address,
+      taker : address,
+      hash : string
+    }
+
+  /************************PUBLIC STATEFUL FUNCTIONS*****************************/
+  public stateful function deposit(
+                                    token : Token,
+                                    amount : int,
+                                    beneficiary : address,
+                                    referral : address
+                                  ) : bool =
+    require(amount > 0, "DEPOSIT_SUB_ZERO_AMOUNT") // the lack of `uint` makes this necessarily
+    let value : int = amount
+    let user  : address = Call.caller
+
+    if(token.address == #0)
+      require(value == Call.value, "DEPOSIT_INVALID_AMOUNT")
+    else
+      require(token.transferFrom(user, Contract.address, value), "DEPOSIT_TOKEN_TRANSFER_FAIL")
+
+    increaseBalance(user, token.address, value)
+
+    if(!userHasReferrer(user))
+      addReferral(user, referral)
+
+    true
+
+  public stateful function withdraw(token : Token, amount : int) : bool =
+    require(amount > 0, "WITHDRAW_SUB_ZERO_AMOUNT") // the lack of `uint` makes this necessarily
+    let user : address = Call.caller
+
+    require(availableBalanceOf(user, token.address) >= amount, "WITHDRAW_INSUFFICIENT_FUNDS")
+
+    decreaseBalance(user, token.address, amount)
+
+    if(token.address == #0)
+      Chain.spend(user, amount)
+    else
+      require(token.transfer(user, amount), "WITHDRAW_TOKEN_TRANSFER_FAIL")
+
+    true
+
+  public stateful function placeOrder(
+                                        sellAmount : int,
+                                        buyAmount : int,
+                                        sellToken : address,
+                                        buyToken : address,
+                                        hash : string
+                                      ) : bool =
+    let maker : address = Call.caller
+    let user : user = getUser(maker, state.users)
+
+    require(availableBalanceOf(maker, sellToken) >= sellAmount, "PLACE_INSUFFICIENT_FUNDS")
+    require(!userHasOrder(hash, user.orders), "PLACE_ORDER_ALREADY_EXISTS")
+
+    let order : order =
+      {
+        sellAmount = sellAmount,
+        buyAmount = buyAmount,
+        filled = 0,
+        status = 0,
+        sellToken = sellToken,
+        buyToken = buyToken,
+        maker = maker,
+        taker = #0,
+        hash = hash}
+
+    decreaseAvailableBalance(maker, sellToken, sellAmount)
+    addUserOrder(maker, hash, order)
+    addTokenOrder(sellToken, hash, order)
+    true
+
+  public stateful function cancelOrder(hash : string) : bool =
+    let maker : address = Call.caller
+    let user : user = getUser(maker, state.users)
+    require(userHasOrder(hash, user.orders), "CANCEL_INVALID_ORDER")
+    let foundOrder : order = getOrderByHash(hash, user.orders)
+    require(foundOrder.status < 2, "CANCEL_INVALID") // user should not be able to cancel fully filled or already cancelled orders, because his locked balance will be decreased
+    updateUserOrderStatus(maker, hash, 3)
+    let updatedOrder : order = updateTokenOrderStatus(hash, foundOrder, 3)
+    let makerRefund : int = foundOrder.sellAmount - getPartialAmount(foundOrder.sellAmount, foundOrder.buyAmount, foundOrder.filled)
+    increaseAvailableBalance(maker, foundOrder.sellToken, makerRefund)
+    deleteOrder(maker, foundOrder.sellToken, hash)
+    addOrderHistory(maker, hash, updatedOrder)
+    addTradeHistory(updatedOrder)
+    true
+
+  public stateful function takeOrder(maker : address, hash : string, takerSellAmount : int) : bool =
+    let taker : address = Call.caller
+    let order : order = getOrder(maker, hash)
+    require(order.status < 3, "TAKE_ORDER_CANCELLED")
+    let takerReceivedAmount : int = getPartialAmount(order.sellAmount, order.buyAmount, takerSellAmount)
+
+    // assert conditions
+    require((order.filled + takerSellAmount) =< order.buyAmount, "TAKE_ORDER_FILLED")
+    require(availableBalanceOf(taker, order.buyToken) >= takerSellAmount, "TAKE_INSUFFICIENT_FUNDS_TAKER")
+    require(fullBalanceOf(maker, order.sellToken) >= takerReceivedAmount, "TAKE_INSUFFICIENT_FUNDS_MAKER")
+
+    // update user balances
+    decreaseFullBalance(maker, order.sellToken, takerReceivedAmount)
+    decreaseBalance(taker, order.buyToken, takerSellAmount)
+    increaseBalanceAfterFee(maker, order.buyToken, takerSellAmount, state.makerFee)
+    increaseBalanceAfterFee(taker, order.sellToken, takerReceivedAmount, state.takerFee)
+
+    // update order history
+    let takerHistoryOrder = getTakerHistoryOrder(takerReceivedAmount, taker, order)
+    let makerHistoryOrder = getMakerHistoryOrder(takerSellAmount, taker, order)
+    addOrderHistory(taker, hash, takerHistoryOrder)
+    addOrderHistory(maker, hash, makerHistoryOrder)
+
+    // update user and token orders
+    if((order.filled + takerSellAmount) == order.buyAmount)
+      deleteOrder(maker, order.sellToken, hash) // if order is fully filled remove it from the open orders
+      addTradeHistory(order{status = 2, filled @ f = f + takerSellAmount})
+    else
+      updateTokenOrderFilledAmountAndStatus(hash, order, takerSellAmount, 1)
+      updateUserOrderFilledAmountAndStatus(maker, hash, takerSellAmount, 1)
+      addTradeHistory(order{status = 1, filled @ f = f + takerSellAmount})
+    true
+
+  /************************PUBLIC VIEW FUNCTIONS*****************************/
+  public function getRefferal(who : address) : address =
+    let referral : address = lookupByAddress(who, state.referrals, #0)
+    referral
+
+  public function userHasReferrer(user : address) : bool =
+    Map.member(user, state.referrals)
+
+  public function getUserBalances(who : address) : list((address, balance)) =
+    let user : user = getUser(who, state.users)
+    let balances : list((address, balance)) = Map.to_list(user.balances)
+    balances
+
+  public function fullBalanceOf(who: address, token : address) : int =
+    let user : user = getUser(who, state.users)
+    let balances = lookupByAddress(token, user.balances, {fullBalance = 0, availableBalance = 0})
+    balances.fullBalance
+
+  public function availableBalanceOf(who: address, token : address) : int =
+    let user : user = getUser(who, state.users)
+    let balances = lookupByAddress(token, user.balances, {fullBalance = 0, availableBalance = 0})
+    balances.availableBalance
+
+  public function getOpenOrdersByUser(who : address) : list((string, order)) =
+    let user : user = getUser(who, state.users)
+    let openOrders : list((string, order)) = Map.to_list(user.orders)
+    openOrders
+
+  public function getOpenOrdersByToken(token : address) : list((string, order)) =
+    let tokenOrders : list((string, order)) = Map.to_list(state.tokenOrders[token = {}])
+    tokenOrders
+
+  public function getOpenSellOrdersByToken(token : address) : list((string, order)) =
+    let l : list((string, order)) = getOpenOrdersByToken(token)
+    filter(isSellOrder, l, token)
+
+  public function getOpenBuyOrdersByToken(token : address) : list((string, order)) =
+    let l : list((string, order)) = getOpenOrdersByToken(token)
+    filter(isBuyOrder, l, token)
+
+  public function getOpenOrdersByUserAndToken(who : address,  token : address) : list((string,order)) =
+    let l : list((string, order)) = getOpenOrdersByUser(who)
+    filter(isOrderOpen, l, token)
+
+  public function getOpenSellOrdersByUserAndToken(who : address, token : address) : list((string,order)) =
+    let l : list((string, order)) = getOpenOrdersByUser(who)
+    filter(isSellOrder, l, token)
+
+  public function getOpenBuyOrdersByUserAndToken(who : address, token : address) : list((string,order)) =
+    let l : list((string, order)) = getOpenOrdersByUser(who)
+    filter(isBuyOrder, l, token)
+
+  public function getOrderHistoryByUser(who : address) : list((string, order)) =
+    let user : user = getUser(who, state.users)
+    let orderHistory : list((string, order)) = Map.to_list(user.orderHistory)
+    orderHistory
+
+  public function getOrderHistoryByToken(token : address) : list(order) =
+    filter(isOrderValidForHistory, state.tradeHistory, token)
+
+  /************************PRIVATE STATEFUL FUNCTIONS*****************************/
+  private stateful function addReferral(user : address, referral : address) =
+    put(state{referrals[user] = referral})
+
+  private stateful function addUserOrder(user : address, hash : string, order : order) =
+    put(state{users @ old_users = old_users{[user] @ old_user = old_user{orders @ old_orders = old_orders{[hash] = order}}}})
+
+  private stateful function addTokenOrder(token: address, hash : string, order : order) =
+    let newTokenOrders :  map(address, map(string, order)) = state.tokenOrders{[token = {[hash] = order}] @ previousOrders = previousOrders{[hash] = order}}
+    put(state{tokenOrders=newTokenOrders})
+
+  private stateful function updateUserOrder(maker : address, hash : string, newOrder : order) =
+    let newUserOrders : map(string, order) = state.users[maker].orders{[hash] = newOrder}
+    let newUser : user = state.users[maker]{orders = newUserOrders}
+    let newUsers : map(address, user) = state.users{[maker] = newUser}
+    put(state{users = newUsers})
+
+  private stateful function updateUserOrderStatus(maker : address, hash : string, status : int) =
+    let newUserOrder : order = state.users[maker].orders[hash]{status = status}
+    updateUserOrder(maker, hash, newUserOrder)
+
+  private stateful function updateUserOrderFilledAmountAndStatus(maker : address, hash : string, filled : int, status : int) =
+    let newUserOrder : order = state.users[maker].orders[hash]{filled @ f = f + filled, status = status}
+    updateUserOrder(maker, hash, newUserOrder)
+
+  private stateful function updateTokenOrderStatus(hash : string, order : order, status : int) : order =
+    let cancelledOrder : order = order{status = status}
+    let newTokenOrders : map(address, map(string, order)) = state.tokenOrders{[order.sellToken = {[hash] = cancelledOrder}] @ previousOrders = previousOrders{[hash] = cancelledOrder}}
+    put(state{tokenOrders=newTokenOrders})
+    cancelledOrder
+
+  private stateful function updateTokenOrderFilledAmountAndStatus(hash : string, order :order, filled : int, status : int) =
+    let filledOrder : order = order{filled @ f = f + filled, status = status}
+    let newTokenOrders : map(address, map(string, order)) = state.tokenOrders{[order.sellToken = {[hash] = filledOrder}] @ previousOrders = previousOrders{[hash] = filledOrder}}
+    put(state{tokenOrders=newTokenOrders})
+
+  private stateful function updateBalance(who : address, token : address, newBalance : balance) =
+    let defaultUser : user = {balances={}, orderHistory= {}, orders={}}
+    let newUserBalances : map(address, balance) = state.users[who=defaultUser].balances{[token] = newBalance}
+    let newUser : user = state.users[who=defaultUser]{balances = newUserBalances}
+    let newUsers : map(address, user) = state.users{[who] = newUser}
+    put(state{users = newUsers})
+
+  private stateful function decreaseFullBalance(who : address, token : address, amount : int) =
+    let newUserBalance : balance = state.users[who].balances[token]{fullBalance @ f = f - amount}
+    updateBalance(who, token, newUserBalance)
+
+  private stateful function increaseBalance(who : address, token : address, amount : int) =
+    increaseFullBalance(who, token, amount)
+    increaseAvailableBalance(who, token, amount)
+
+  private stateful function decreaseBalance(who : address, token : address, amount : int) =
+    decreaseFullBalance(who, token, amount)
+    decreaseAvailableBalance(who, token, amount)
+
+  private stateful function increaseFullBalance(who : address, token : address, amount : int) =
+    let defaultUser : user = {balances = {}, orderHistory = {}, orders = {}}
+    let defaultBalance : balance = {fullBalance = 0, availableBalance = 0}
+    let newUserBalance : balance = state.users[who = defaultUser].balances[token = defaultBalance]{fullBalance @ b = b + amount}
+    updateBalance(who, token, newUserBalance)
+
+  private stateful function decreaseAvailableBalance(who : address, token : address, amount : int) =
+    let newUserBalance : balance = state.users[who].balances[token]{availableBalance @ a = a - amount}
+    updateBalance(who, token, newUserBalance)
+
+  private stateful function increaseAvailableBalance(who : address, token : address, amount : int) =
+    let defaultUser : user = {balances = {}, orderHistory = {}, orders = {}}
+    let defaultBalance : balance = {fullBalance = 0, availableBalance = 0}
+    let newUserBalance : balance = state.users[who = defaultUser].balances[token = defaultBalance]{availableBalance @ b = b + amount}
+    updateBalance(who, token, newUserBalance)
+
+  private stateful function deleteUserOrder(user : address, hash : string) =
+    let newUser : user = state.users[user]{orders @ o = Map.delete(hash, o)}
+    let newUsers : map(address, user) = state.users{[user] = newUser}
+    put(state{users = newUsers})
+
+  private stateful function deleteTokenOrder(token : address, hash : string) =
+    let newTokenOrders : map(address, map(string, order)) = state.tokenOrders{[token] @ previousOrders = Map.delete(hash, previousOrders)}
+    put(state{tokenOrders=newTokenOrders})
+
+  private stateful function deleteOrder(user : address, token : address, hash : string) =
+    deleteUserOrder(user, hash)
+    deleteTokenOrder(token, hash)
+
+  private stateful function addTradeHistory(order : order) =
+    put(state{ tradeHistory = order :: state.tradeHistory })
+
+  private stateful function addOrderHistory(user : address, hash : string, order : order) =
+    put(state{users @ old_users = old_users{[user] @ old_user = old_user{orderHistory @ old_orders = old_orders{[hash] = order}}}})
+
+  /************************PRIVATE VIEW FUNCTIONS*****************************/
+  private function getUser(who : address, users : map(address, user)) : user =
+    let user : user = lookupByAddress(who, users, {balances={}, orderHistory= {}, orders={}})
+    user
+
+  private function getOrder(who : address, hash : string) : order =
+    let user : user = getUser(who, state.users)
+    require(userHasOrder(hash, user.orders), "GET_ORDER_INVALID_ORDER")
+    let foundOrder : order = getOrderByHash(hash, user.orders)
+    foundOrder
+
+  private function userHasOrder(hash: string, orders : map(string, order)) : bool =
+    Map.member(hash, orders)
+
+  private function getMakerHistoryOrder(filled : int, taker : address, order : order) : order =
+    let makerOrder : order = order{taker = taker, filled = filled}
+    makerOrder
+
+  private function getTakerHistoryOrder(filled : int, taker : address, order : order) : order =
+    let takerOrder : order = order{buyToken = order.sellToken, sellToken = order.buyToken, taker = taker, filled = filled}
+    takerOrder
+
+  private function lookupByAddress(k : address, m, v) =
+    Map.lookup_default(k, m, v)
+
+  private function getOrderByHash(hash : string, orders : map(string, order)) =
+    Map.lookup_default(hash, orders, {
+      sellAmount = 0, 
+      buyAmount = 0, 
+      filled = 0, 
+      status = 4, 
+      sellToken = #0, 
+      buyToken = #0, 
+      maker = #0, 
+      taker = #0, 
+      hash = "0"})
+
+  /************************HELPER FUNCTIONS*****************************/
+  private function filter (f : ('a, address) => bool, l : list('a), token : address) = filter'(f, l, token, [])
+  private function filter'(f : ('a, address) => bool, l : list('a), token : address, acc : list('a)) =
+    switch(l)
+      [] => acc
+      e :: g =>
+        if(f(e, token))
+          filter'(f, g, token, e :: acc)
+        else
+          filter'(f, g, token, acc)
+
+  private function isOrderValidForHistory(order : order, tokenAddress : address) : bool =
+    (order.buyToken == tokenAddress || order.sellToken == tokenAddress) && order.status < 3
+
+  private function isOrderOpen(order : (string,order), tokenAddress : address) : bool =
+    let o = pairSecond(order)
+    o.buyToken == tokenAddress || o.sellToken == tokenAddress
+
+  private function isBuyOrder(order : (string,order), tokenAddress : address) : bool =
+    let o = pairSecond(order)
+    o.buyToken == tokenAddress
+
+  private function isSellOrder(order : (string,order), tokenAddress : address) : bool =
+    let o = pairSecond(order)
+    o.sellToken == tokenAddress
+
+  function pairSecond(tuple) =
+    switch(tuple)
+      (_, e) => e
+
+  /************************MATH HELPER*****************************/
+  private function getPartialAmount(numerator : int, denominator : int, target : int) : int =
+    let partialAmount = (numerator * target) / denominator
+    partialAmount
+
+  private function getFeeAmount(numerator : int, target : int) : int =
+    let feeAmount = (numerator * target) / 1000000000000000000
+    feeAmount
+
+  private function increaseBalanceAfterFee(who : address, token : address, amount : int, fee : int) =
+    let feeAmount : int = getFeeAmount(amount, fee)
+    let increaseAmount : int = amount - feeAmount
+
+    if(userHasReferrer(who))
+      let referral : address = getRefferal(who)
+      let referralFee : int = getFeeAmount(feeAmount, state.referralFee)
+      let exchangeFee : int = feeAmount - referralFee
+      increaseBalance(who, token, increaseAmount)
+      increaseBalance(state.feeAccount, token, exchangeFee)
+      increaseBalance(referral, token, referralFee)
+    else
+      increaseBalance(who, token, increaseAmount)
+      increaseBalance(state.feeAccount, token, feeAmount)
+
+  /************************ASSERT*****************************/
+  private function require(b : bool, err : string) =
+    if(!b)
+      abort(err)
