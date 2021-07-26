@@ -1,5 +1,5 @@
 
-# Weekly Status Report for AETERNITY Foundation
+# Weekly Status Report for Aeternity Foundation
 
 ## Weekly Report - 12th July to 18th July
 
