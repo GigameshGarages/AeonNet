@@ -10,7 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@aeternity/aepp-sdk": "^7.7.0",
+    "@aeternity/aepp-sdk": "7.0.0",
     "aeproject-lib": "^2.2.0"
   }
 }
