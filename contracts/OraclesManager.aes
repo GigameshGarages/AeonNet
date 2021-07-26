@@ -1,0 +1,45 @@
+contract OraclesManager =
+    record state = {
+        addr: map(string, address),
+        oracles: list(string),
+        contract_oracle: map(address, string),
+        owner: address
+     }
+
+    stateful entrypoint init(oracle_name: string, _addr: address) = { 
+            addr = {[oracle_name] = _addr},
+            oracles = [oracle_name],
+            contract_oracle = {},
+            owner = Call.caller}
+
+    stateful entrypoint changeOwner(new_owner: address) : bool = 
+        require(state.owner == Call.caller, "Only owner can call it")
+        put(state{owner = new_owner})
+        true
+    
+    public entrypoint getOwner() : address =
+        state.owner
+    
+    public entrypoint getAddress(id: string) : address =
+        state.addr[id]
+
+    stateful entrypoint addNewOrModifyOracleAddress(name: string, _addr: address) : bool = 
+        require(state.owner == Call.caller, "Only owner can call it")
+        put(state{addr[name] = _addr})
+        put(state{oracles @ o = name :: o})
+        true
+
+    stateful entrypoint listOracleAddresses() : list(string * address) =
+         Map.to_list(state.addr)
+
+    stateful entrypoint setContractOracle(oracle_id: string) : bool =
+        require(Address.is_contract(Call.caller), "Only smart contracts can call it")
+        put(state{contract_oracle[Call.caller] = oracle_id})
+        true
+    
+    stateful entrypoint getContractOracle(contract_address: address) : string =
+        require(Address.is_contract(Call.caller), "Only smart contracts can call it")
+        state.contract_oracle[Call.caller]
+    
+    stateful entrypoint getListOfOracles() : list(string) =
+        state.oracles
