@@ -1,5 +1,5 @@
 # AeonNet
-After a brief interlude, I am really delighted to be back in action in the aeternity ecosystem. I really enjoyed coding smart contracts in Sophia with Time Value Tokens as an NFT with a basic Property Verifier together with a Hash Time Locked Contract (HTLC).  This prototype is named as 'AeonNet'. It was an double delight to win the esteemed Human DeFi Hackathon prizes for this idea.
+AeonNet is a Time Locked Trade Tokenisation Platform written in Sophia Smart Contracts with Time Value Tokens as an NFT with a basic Property Verifier together with a Hash Time Locked Contract (HTLC).  This prototype is named as 'AeonNet'. It was an double delight to win the esteemed Human DeFi Hackathon prizes for this idea.
 
 ## Summary
 - Convergent and Coherent Tangible Time Value ( Non - Fungible ) Tokens Powered by Aeternity Protocol Hash Time Locked Contracts (HTLC). 
