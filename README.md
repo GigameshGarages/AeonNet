@@ -2,7 +2,7 @@
 AeonNet is a Time Locked Trading Time Value Tokenisation Platform deployed on Aeternity Application Architecture with Smart Contracts written on Sophia, a functonal programming language. It is designed as a decentralised application where traders can sell their expertise to novice traders. Time Trade Tokenss are built with NFT standards. All time locks are aggregated using ECDSA basd elliptical curve cryptographic security with a Hash Time Locked Contract (HTLC) for verification purpose.  
 
 ## Summary
-- Convergent and Coherent Tangible Time Value ( Non - Fungible ) Tokens Powered by Aeternity Protocol Hash Time Locked Contracts (HTLC). 
+- Convergent and Coherent Time Range Tokens Powered by Aeternity Protocol Hash Time Locked Contracts (HTLC). 
 
 ## Concept
 - What Is Time Value? In options trading, time value refers to the portion of an option's premium that is attributable to the amount of time remaining until the expiration of the option contract. The premium of any option consists of two components: its intrinsic value and its time value.
