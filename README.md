@@ -28,8 +28,11 @@ AeonNet is a Trading Time Value Tokenisation Platform deployed on Aeternity Appl
 - NodeJS
 - NPM
 
-## References
+## References on Time Locks
 - Hashed Time Locked Contracts > https://www.investopedia.com/terms/h/hashed-timelock-contract.asp
 - Kaliedo Way - https://docs.kaleido.io/kaleido-services/tokens/anatomy-of-an-htlc
 - ERC20 TimeLocking > https://medium.com/@parishilanrayamajhi/erc20-time-locking-explained-db7fa6fd0166
 - Timelocking and Vesting > https://ethereum.stackexchange.com/questions/62126/time-lock-and-vesting-smart-contract
+
+## References on Options Trading
+- https://www.ally.com/do-it-right/investing/trading-options-for-beginners/
