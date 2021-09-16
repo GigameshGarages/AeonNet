@@ -1,5 +1,5 @@
 # AeonNet
-AeonNet is a Time Locked Trading Time Value Tokenisation Platform deployed on Aeternity Application Architecture with Smart Contracts written on Sophia, a functonal programming language. It is designed as a decentralised application where traders can sell their expertise to novice traders. Time Trade Tokenss are built with NFT standards. All time locks are aggregated using ECDSA basd elliptical curve cryptographic security with a Hash Time Locked Contract (HTLC) for verification purpose.  
+AeonNet is a Trading Time Value Tokenisation Platform deployed on Aeternity Application Architecture with Smart Contracts written on Sophia, a functonal programming language. It is designed as a decentralised application where traders can sell their expertise to novice traders. Time Trade Tokenss are built with NFT standards. All time locks are aggregated using ECDSA basd elliptical curve cryptographic security with a Hash Time Locked Contract (HTLC) for verification purpose.  
 
 ## Summary
 - Dynamic and Decentralised Trading Time Tokens Powered by Aeternity Architecture based Hash Time Locked Contracts (HTLC). 
