@@ -11,9 +11,9 @@ AeonNet is a Time Locked Trading Time Value Tokenisation Platform deployed on Ae
 
 ## Roadmap
 
-This prototype is a step towards using Aeternity Protocol for tokenising Bitcoin Options Trading ( among other options trading possibilities ) using the power of hash time locking, time value tokenisation and time value streaming in the near future. It is also possible to build trading settlement systems using this concept. 
+- This prototype is a step towards using Aeternity Protocol for tokenising Bitcoin Options Trading ( among other options trading possibilities ) using the power of hash time locking, time value tokenisation and time value streaming in the near future. It is also possible to build trading settlement systems using this concept. 
 
-It has been a solo effort so far. I am looking forward to collaborating with hello Aeternitians here to refine the prototype and deploy this into the Aeternity MainNet as a time locked bridge to bring the might of Bitcoin into the magical powers and possibilities of Aeternity !! After all, in our voyage to Aeternity, we need a lot of time locks and time machines.
+- It has been a solo effort so far. I am looking forward to collaborating with hello Aeternitians here to refine the prototype and deploy this into the Aeternity MainNet as a time locked bridge to bring the might of Bitcoin into the magical powers and possibilities of Aeternity !! After all, in our voyage to Aeternity, we need a lot of time locks and time machines.
 
 ## Components
 - Hash Time Locks implemented through the Time Stamping Transactions in a Blockchain
