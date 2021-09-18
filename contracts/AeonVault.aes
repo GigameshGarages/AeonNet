@@ -1,10 +1,10 @@
-// Adaptation of - https://github.com/arthas168/Hash-Time-Lock
+/// @title - A Hash Time Locked Vault for storing the money towards paying the seller
 
 @compiler >= 4
 
 include "List.aes"
 
-payable contract HashTimeLock = 
+payable contract AeonVault = 
 
   record state = {
     contracts : map(bytes(32), lock_contract) }
