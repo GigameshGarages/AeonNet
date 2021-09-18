@@ -8,17 +8,17 @@ contract AeonAsset =
    entrypoint nameExists(name: string) : bool =
       Map.member(name, state.assets)
 
-   stateful entrypoint createHamster(assetName: string) =
+   stateful entrypoint createAsset(assetName: string) =
       require(!nameExists(assetName), "Name is already taken")
-      createHamsterByNameDNA(assetName, generateDNA(hamsterName))
+      createAssetByNameIndex(assetName, generateIndex(assetName))
    
-   entrypoint getHamsterDNA(assetName: string) : hash =
-      require(nameExists(assetName), "Hamster does not exist!")
+   entrypoint getAssetIndex(assetName: string) : hash =
+      require(nameExists(assetName), "Asset does not exist!")
       state.hamsters[assetName]
 
-   stateful function createHamsterByNameDNA(name: string, dna: hash) =
+   stateful function createAssetByNameIndex(name: string, dna: hash) =
       put(state{assets[name] = dna, next_id = (state.next_id + 1)})
       Chain.event(NewAsset(state.next_id, name, dna))
  
-   function generateDNA(name : string) : hash =
+   function generateIndex(name : string) : hash =
       String.sha3(name)
