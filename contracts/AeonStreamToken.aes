@@ -2,10 +2,11 @@
 
 include "Option.aes"
 
-/// @title - Fungible token basic
-contract TimeStreamToken =
+/// @title - Aeon Token to aggregate the trade time stream
+/// @summary - Trade Time is always an additive commodity
 
-  // This defines the state of type record encapsulating the contract's mutable state
+contract AeonStreamToken =
+  
   record state =
     { owner        : address      // the smart contract's owner address
     , total_supply : int          // total token supply
@@ -31,6 +32,7 @@ contract TimeStreamToken =
   // Create a time stream token with
   // the following `name` `symbol` and `decimals`
   // and set the inital smart contract state
+  
   entrypoint init(name: string, decimals : int, symbol : string, initial_owner_balance : option(int)) =
     // If the `name` lenght is less than 1 symbol abort the execution
     require(String.length(name) >= 1, "STRING_TOO_SHORT_NAME")
