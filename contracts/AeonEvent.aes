@@ -1,6 +1,6 @@
 @compiler >= 4
 
-contract TimeValueAggregator =
+contract AeonEvent =
    record state  = 
       { lockGroup : map(address, lockSequence) }
 
