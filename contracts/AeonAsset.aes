@@ -1,3 +1,6 @@
+// The program to create the Derivative and other Financial Assets on Aeon Network
+// This program map their essential properties such as Name, Index and Interest Rates.
+
 contract AeonAsset =
    datatype event = NewAsset(indexed int, string, hash)
 
