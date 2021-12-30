@@ -13,18 +13,18 @@ https://www.notion.so/Smart-Contracts-83f755edd5de41c590c6a2edb098faed
 
 Development in Progress >>
 
-Adapted Security Module using ECDH by Milan Radkov
-Adapted Exchange Module using WeiDex by Milan Radkov
-Removed Redundant Contracts in the latest update
+- Adapted Security Module using ECDH by Milan Radkov
+- Adapted Exchange Module using WeiDex by Milan Radkov
+- Removed Redundant Contracts in the latest update
+
 Next Steps >>
 
-Refinement of DEX
-Refinement of ECDH
-Refinement of TimeLocks
-Refinement of AssetList
-Deployment to Integration Environment
-Development of Web Application
-
+- Refinement of DEX
+- Refinement of ECDH
+- Refinement of TimeLocks
+- Refinement of AssetList
+- Deployment to Integration Environment
+- Development of Web Application
 
 ## Weekly Report - 19th July to 25th July
 
@@ -38,12 +38,11 @@ Customisation of Aeternity Oracles
 
 Next Steps >>
 
-Refinement of DEX
-Refinement of ECDH
-Refinement of TimeLocks
-Refinement of AssetList
-Deployment to Integration Environment
-Development of Web Application
-
+- Refinement of DEX
+- Refinement of ECDH
+- Refinement of TimeLocks
+- Refinement of AssetList
+- Deployment to Integration Environment
+- Development of Web Application
 
 ## Weekly Report - 26th July to 1st August
