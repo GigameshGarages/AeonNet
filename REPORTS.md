@@ -46,3 +46,14 @@ Next Steps >>
 - Development of Web Application
 
 ## Weekly Report - 26th July to 1st August
+
+- UI Development in Progress >>
+- UI Documentation in Progress >>
+
+Next Steps >>
+
+- Refinement of DEX
+- Refinement of Tokens
+- Refinement of TimeLocks
+- Deployment to Integration Environment
+- Development of Web Application
