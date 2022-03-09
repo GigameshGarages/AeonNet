@@ -1,10 +1,17 @@
 # AeonNet
-AeonNet is a Trading Time Value Tokenisation Platform deployed on Aeternity Application Architecture with Smart Contracts written on Sophia, a functonal programming language. It is designed as a decentralised application where traders can sell their expertise to novice traders. Time Trade Tokenss are built with NFT standards. All time locks are aggregated using ECDSA basd elliptical curve cryptographic security with a Hash Time Locked Contract (HTLC) for verification purpose.  
+AeonNet is a Trading Time Value Tokenisation System deployed on Aeternity Application Architecture with Smart Contracts written on Sophia, a functonal programming language. It is designed as a decentralised application where traders can sell the tokens that they have curated over the time. All time locks are aggregated using Digital Signatures and Hash Time Locked Contract (HTLC) for verification purpose.  
 
 ## Summary
 - Decentralised Trading Time Tokens Powered by Aeternity Architecture based Hash Time Locked Contracts (HTLC). 
 
 ## Concept
+- A financial derivative is a contract whose value depends upon the value of some underlying asset, such as a stock. 
+- The contract specifies the rights and obligations between the buyer and the seller to receive or deliver future cash flows based on some future event.
+- One of the most popular types of derivative is option. 
+- Option is a contract between two parties on trading an asset at a future date. 
+- There are two basic types of option: call and put. 
+- A call option gives the holder the right (not the obligation) to buy an underlying asset for a specified strike price by a certain expiration date. 
+- A put option gives the holder the right (not the obligation) to sell an underlying asset for a specified strike price by a certain expiration date.
 - Options trading is the trading of instruments that gives the right to buy or sell a specific security on a specific date at a specific price.
 - Time value refers to the portion of an option's premium that is attributable to the amount of time remaining until the expiration of the option contract. 
 - The premium of any option consists of two components: its intrinsic value and its time value.
