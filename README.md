@@ -10,8 +10,8 @@ AeonNet is a Trading Time Value Tokenisation System deployed on Aeternity Applic
 - One of the most popular types of derivative is option. 
 - Option is a contract between two parties on trading an asset at a future date. 
 - There are two basic types of option: call and put. 
-- A call option gives the holder the right (not the obligation) to buy an underlying asset for a specified strike price by a certain expiration date. 
-- A put option gives the holder the right (not the obligation) to sell an underlying asset for a specified strike price by a certain expiration date.
+- A call option gives the holder the right (not the obligation) to buy an underlying asset for a specified strike price by an expiration date. 
+- A put option gives the holder the right (not the obligation) to sell an underlying asset for a specified strike price by an expiration date.
 - Options trading is the trading of instruments that gives the right to buy or sell a specific security on a specific date at a specific price.
 - Time value refers to the portion of an option's premium that is attributable to the amount of time remaining until the expiration of the option contract. 
 - The premium of any option consists of two components: its intrinsic value and its time value.
