@@ -4,7 +4,9 @@ AeonNet is a Trading Time Value Tokenisation System deployed on Aeternity Applic
 ## Summary
 -  Trading Time Tokens Powered by Aeternity Architecture based Hash Time Locked Contracts (HTLC). 
 
-## Concept
+## Context
+- In the traditional finance, derivatives are positions on stocks and bonds that a trader does not own. 
+- If a trader seeks to profit from speculating on the price fluctuations of a stock that they do not own, they can do so through derivatives markets.
 - A financial derivative is a contract whose value depends upon the value of some underlying asset, such as a stock. 
 - The contract specifies the rights and obligations between the buyer and the seller to receive or deliver future cash flows based on some future event.
 - One of the most popular types of derivative is option. 
@@ -13,6 +15,8 @@ AeonNet is a Trading Time Value Tokenisation System deployed on Aeternity Applic
 - A call option gives the holder the right (not the obligation) to buy an underlying asset for a strike price by an expiration date. 
 - A put option gives the holder the right (not the obligation) to sell an underlying asset for a strike price by an expiration date.
 - Options trading is the trading of instruments that gives the right to buy or sell a specific security on specific a date at a price.
+
+## Concept
 - Time value refers to the portion of an option's premium that is attributable to the amount of time remaining until the expiration of the option contract. 
 - The premium of any option consists of two components: its intrinsic value and its time value.
 - Time Value is also considered as an extrinsic or instrumental value in the options trading context. 
