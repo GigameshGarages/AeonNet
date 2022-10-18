@@ -2,7 +2,7 @@
 AeonNet is a Trading Time Value Tokenisation System deployed on Aeternity Application Architecture with Smart Contracts written on Sophia, a functonal programming language. It is designed as a decentralised application where traders can sell the tokens that they have curated over the time. All time locks are aggregated using Digital Signatures and Hash Time Locked Contract (HTLC) for verification purpose.  
 
 ## Summary
-- Decentralised Trading Time Tokens Powered by Aeternity Architecture based Hash Time Locked Contracts (HTLC). 
+-  Trading Time Tokens Powered by Aeternity Architecture based Hash Time Locked Contracts (HTLC). 
 
 ## Concept
 - A financial derivative is a contract whose value depends upon the value of some underlying asset, such as a stock. 
