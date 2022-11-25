@@ -1,5 +1,5 @@
 ## Overview
-AeonNet is a Trading Time Value Tokenisation System deployed on Aeternity Application Architecture with Smart Contracts written on Sophia, a functonal programming language. Time locks represent the trading activity tokens. AeonNet aims to quantify the quality of trading activity. It tokenises the flow of monery in the financial assets. Risk in every asset is quantified based on the ratio between the value of an asset and the number of traders trading on that asset on a particular time. 
+AeonNet is a Trading Time Value Tokenisation System deployed on Aeternity Application Architecture with Smart Contracts written on Sophia, a functonal programming language. Time locks represent the trading activity tokens. AeonNet aims to quantify the quality of trading activity. It tokenises the flow of monery in the financial assets. Value of the asset is tokenised with respect to the time weighted average of the fluctuations in its value. Risk in every asset is quantified based on the ratio between the value of an asset and the number of traders trading on that asset on a particular time. 
 
 ## Components
 
